@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: corda
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  source:
+    repoURL: registry-1.docker.io/corda
+    targetRevision: 5.1.0
+    helm:
+      valuesObject:
+        bootstrap:
+          kafka:
+            replicas: 1
+        db:
+          cluster:
+            host: prereqs-postgres
+            password:
+              valueFrom:
+                secretKeyRef:
+                  key: corda-password
+                  name: prereqs-postgres
+            username:
+              value: corda
+        kafka:
+          bootstrapServers: 'prereqs-kafka:9092'
+          sasl:
+            enabled: true
+            mechanism: PLAIN
+            password:
+              valueFrom:
+                secretKeyRef:
+                  key: admin-password
+                  name: prereqs-kafka
+            username:
+              value: admin
+          tls:
+            enabled: true
+            truststore:
+              valueFrom:
+                secretKeyRef:
+                  key: ca.crt
+                  name: prereqs-kafka
+        logging:
+          format: text
+    chart: corda
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: corda
+  syncPolicy:
+    automated: {}

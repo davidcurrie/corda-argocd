@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prereqs
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: registry-1.docker.io/corda
+    targetRevision: 0.2.0
+    chart: corda-dev-prereqs
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: corda
+  syncPolicy:
+    automated: {}
