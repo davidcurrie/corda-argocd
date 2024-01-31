@@ -44,7 +44,7 @@ spec:
                   key: ca.crt
                   name: prereqs-kafka
         logging:
-          format: text
+          format: json
     chart: corda
   destination:
     server: 'https://kubernetes.default.svc'
